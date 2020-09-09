@@ -577,7 +577,7 @@ class Counter(dict):
     #   http://code.activestate.com/recipes/259174/
     #   Knuth, TAOCP Vol. II section 4.6.3
 
-    def __init__(self, iterable=None, /, **kwds):
+    def __init__(self, iterable=None, noElemValue=0, /, **kwds):
         '''Create a new, empty Counter object.  And if given, count elements
         from an input iterable.  Or, initialize the count from another mapping
         of elements to their counts.
@@ -589,12 +589,18 @@ class Counter(dict):
 
         '''
         super().__init__()
+        self.noElemValue = noElemValue
         self.update(iterable, **kwds)
 
     def __missing__(self, key):
         'The count of elements not in the Counter is zero.'
         # Needed so that self[missing_item] does not raise KeyError
-        return 0
+        """
+        This is updated to give the user the freedom to choose what default value it wants to return or show
+        in case a given key doesnt have a value in the Counter. Sometimes we need to return -1 for elements not present
+        so this way we can give the option to the user to decide what it wants as the value for the noElemValue to be returned.
+        """
+        return self.noElemValue
 
     def most_common(self, n=None):
         '''List the n most common elements and their counts from the most
